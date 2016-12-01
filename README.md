@@ -156,17 +156,142 @@ sudo nano /etc/hosts
 # Copy hadoop jars file into client node
 scp /home/hduser/hadoop-2.6.0.tar.gz hdclient@ztg-client:/home/hdclient
 
-wget http://public-repo-1.hortonworks.com/HDP/tools/2.4.2.0/hdp_manual_install_rpm_helper_files-2.4.2.0.258.tar.gz
-tar zxvf hdp_manual_install_rpm_helper_files-2.4.2.0.258.tar.gz
+
 
 ```
 
-> Step 1: Install Java JDK
+> Step 10: Copy hadoop code on client
+
+```sh
+# Log to dataiku
+sudo su dataiku
+
+# download hadoop distribution
+wget http://apache.trisect.eu/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz
+
+tar zxvf hadoop-2.6.0.tar.gz
+
+mv hadoop-2.6.0 hadoop
+
+```
+
+> Step 11: Update environment variables for hdclient in its .bashrc
+
+```sh
+# Edit file
+nano .bashrc
+
+# Add the following code
+#HADOOP VARIABLES START
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+export HADOOP_INSTALL=/home/dataiku/hadoop
+export PATH=$PATH:$HADOOP_INSTALL/bin
+export PATH=$PATH:$HADOOP_INSTALL/sbin
+#Dont need the exports below.
+#export HADOOP_MAPRED_HOME=$HADOOP_INSTALL
+#export HADOOP_COMMON_HOME=$HADOOP_INSTALL
+#export HADOOP_HDFS_HOME=$HADOOP_INSTALL
+export YARN_HOME=$HADOOP_INSTALL
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_INSTALL/lib/native
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_INSTALL/lib/native"
+#HADOOP VARIABLES END
+
+# Run 
+source ~/.bashrc
+
+```
+
+> Step 12: Update Configuration files on Client Node
+
+```sh
+# Edit /home/dataiku/hadoop/etc/hadoop/core-site.xml
+nano /home/dataiku/hadoop/etc/hadoop/core-site.xml
+
+# Chage the configuration to match to the following
+<configuration>
+<property>
+  <name>fs.defaultFS</name>
+  <value>hdfs://hadoop-m.c.equipe-1314.internal:8020</value>
+  <description>Use HDFS as file storage engine</description>
+</property>
+</configuration>
+
+# Edit /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
+cp /home/dataiku/hadoop/etc/hadoop/mapred-site.xml.template /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
+nano /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
+
+# Chage the configuration to match to the following
+
+<configuration>
+<property>
+ <name>mapreduce.jobtracker.address</name>
+ <value>hadoop-m:54311</value>
+ <description>The host and port that the MapReduce job tracker runs
+  at. If “local”, then jobs are run in-process as a single map
+  and reduce task.
+</description>
+</property>
+</configuration>
+
+# On master node 
+sudo  adduser  --ingroup  hadoop dataiku
+
+# On master node 
+sudo su dataiku
+mkdir /home/dataiku/tmp
+chmod 777 /home/dataiku/tmp
+
+
+
+# Run mapreduce
+cd hadoop
+hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar pi 2 4
+
+# Create a directory structure in HDFS for the new use
+hadoop fs -mkdir /user/dataiku/
+hadoop fs -chown -R dataiku:dataiku /user/dataiku
+
+
+
+```
+
+> Step 12: Spark configuration
+```sh
+Download spark
+wget http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz
+wget http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.4.tgz
+
+tar zxvf spark-1.6.1-bin-hadoop2.6.tgz
+mv spark-1.6.1-bin-hadoop2.6 spark
+
+cp /home/dataiku/spark/conf/spark-env.sh.template /home/dataiku/spark/conf/spark-env.sh
+nano /home/dataiku/spark/conf/spark-env.sh
+
+export HADOOP_CONF_DIR=/home/dataiku/hadoop/etc/hadoop/
+export HADOOP_CONF_DIR="${HADOOP_CONF_DIR:-/home/dataiku/hadoop/etc/hadoop}"
+
+
+# From master node copy core-site.xml and yarn-site.xml to client node
+chmod 644 *.xml
+
+# change in hadoop in client node
+mv hadoop/etc/hadoop/core-site.xml hadoop/etc/hadoop/core-site.xml.bkp
+mv hadoop/etc/hadoop/yarn-site.xml hadoop/etc/hadoop/yarn-site.xml.bkp
+
+# copy yarn-site.xml and core-site.xml to hadoop home
+cp /home/dataiku/core-site.xml /home/dataiku/hadoop/etc/hadoop/
+cp /home/dataiku/yarn-site.xml /home/dataiku/hadoop/etc/hadoop/
+
+
+
+```
+
+> Step 12: Update Configuration files on Client Node
 
 ```sh
 ```
 
-> Step 1: Install Java JDK
+> Step 12: Update Configuration files on Client Node
 
 ```sh
 ```
