@@ -136,6 +136,15 @@ sudo cp /etc/ssh/sshd_config.bak /etc/ssh/sshd_config
 > Step 10: Install Hadoop on Client Node
 We need hadoop to compile the jars on client and submit the job but we will not run any hadoop daemons.
 
+HDP=/usr/hdp/current
+export HADOOP_HOME=$HDP/hadoop-client/
+export HADOOP_COMMON_HOME=$HDP/hadoop-client/
+export HADOOP_HDFS_HOME=$HDP/hadoop-hdfs-client/ 
+export HADOOP_MAPRED_HOME=$HDP/hadoop-mapreduce-client/
+export HADOOP_SPARK_HOME=$HDP/spark-client/
+export HADOOP_HIVE_HOME=$HDP/hive-client/
+export HADOOP_YARN_HOME=$HDP/hadoop-yarn-client/
+
 ```sh 
 # In order to use scp from master node, on master node, as root, edit /etc/hosts and add client node ip address.
 # Edit file on master node
@@ -147,6 +156,8 @@ sudo nano /etc/hosts
 # Copy hadoop jars file into client node
 scp /home/hduser/hadoop-2.6.0.tar.gz hdclient@ztg-client:/home/hdclient
 
+wget http://public-repo-1.hortonworks.com/HDP/tools/2.4.2.0/hdp_manual_install_rpm_helper_files-2.4.2.0.258.tar.gz
+tar zxvf hdp_manual_install_rpm_helper_files-2.4.2.0.258.tar.gz
 
 ```
 
