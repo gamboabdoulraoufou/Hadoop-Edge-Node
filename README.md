@@ -133,34 +133,21 @@ sudo cp /etc/ssh/sshd_config.bak /etc/ssh/sshd_config
 
 ```
 
-> Step 10: Install Hadoop on Client Node
-We need hadoop to compile the jars on client and submit the job but we will not run any hadoop daemons.
+> Step 10: Create Hadoop user _Master node_
 
-HDP=/usr/hdp/current
-export HADOOP_HOME=$HDP/hadoop-client/
-export HADOOP_COMMON_HOME=$HDP/hadoop-client/
-export HADOOP_HDFS_HOME=$HDP/hadoop-hdfs-client/ 
-export HADOOP_MAPRED_HOME=$HDP/hadoop-mapreduce-client/
-export HADOOP_SPARK_HOME=$HDP/spark-client/
-export HADOOP_HIVE_HOME=$HDP/hive-client/
-export HADOOP_YARN_HOME=$HDP/hadoop-yarn-client/
+```sh
+# Create a directory structure in HDFS for the new use
+hadoop fs -mkdir /user/dataiku/
+hadoop fs -chown -R dataiku:dataiku /user/dataiku
 
-```sh 
-# In order to use scp from master node, on master node, as root, edit /etc/hosts and add client node ip address.
-# Edit file on master node
-sudo nano /etc/hosts
-
-# Add edge host into master node /etc/hosts file
-10.132.0.2 edge.c.equipe.internal edge
-
-# Copy hadoop jars file into client node
-scp /home/hduser/hadoop-2.6.0.tar.gz hdclient@ztg-client:/home/hdclient
-
-
+# On master node 
+sudo su dataiku
+mkdir /home/dataiku/tmp
+chmod 777 /home/dataiku/tmp
 
 ```
 
-> Step 10: Copy hadoop code on client
+> Step 10: Download Hadoop ditribution _Client node_
 
 ```sh
 # Log to dataiku
@@ -169,13 +156,15 @@ sudo su dataiku
 # download hadoop distribution
 wget http://apache.trisect.eu/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz
 
+# Unpack
 tar zxvf hadoop-2.6.0.tar.gz
 
+# Rename Hadoop folder
 mv hadoop-2.6.0 hadoop
 
 ```
 
-> Step 11: Update environment variables for hdclient in its .bashrc
+> Step 11: Update environment variables for dataiku in its .bashrc _Client node_
 
 ```sh
 # Edit file
@@ -201,7 +190,7 @@ source ~/.bashrc
 
 ```
 
-> Step 12: Update Configuration files on Client Node
+> Step 12: Configure HDFS _Client Node_
 
 ```sh
 # Edit /home/dataiku/hadoop/etc/hadoop/core-site.xml
@@ -215,13 +204,22 @@ nano /home/dataiku/hadoop/etc/hadoop/core-site.xml
   <description>Use HDFS as file storage engine</description>
 </property>
 </configuration>
+ 
+# Or copy core-site.xml from master node to client node
+scp /home/hduser/hadoop-2.6.0.tar.gz hdclient@ztg-client:/home/hdclient
 
+# HDFS 
+hadoop hs -ls /user/
+
+```
+
+> Step 13: Configure Mapreduce _Client node_
+```sh
 # Edit /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
 cp /home/dataiku/hadoop/etc/hadoop/mapred-site.xml.template /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
 nano /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
 
 # Chage the configuration to match to the following
-
 <configuration>
 <property>
  <name>mapreduce.jobtracker.address</name>
@@ -233,35 +231,21 @@ nano /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
 </property>
 </configuration>
 
-# On master node 
-sudo  adduser  --ingroup  hadoop dataiku
-
-# On master node 
-sudo su dataiku
-mkdir /home/dataiku/tmp
-chmod 777 /home/dataiku/tmp
-
-
-
 # Run mapreduce
 cd hadoop
 hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar pi 2 4
 
-# Create a directory structure in HDFS for the new use
-hadoop fs -mkdir /user/dataiku/
-hadoop fs -chown -R dataiku:dataiku /user/dataiku
-
-
-
 ```
 
-> Step 12: Spark configuration
+> Step 14: Configure Spark _Client node_
 ```sh
-Download spark
+# Download spark
 wget http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz
-wget http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.4.tgz
 
+# Unpack spark
 tar zxvf spark-1.6.1-bin-hadoop2.6.tgz
+
+# Remane Spark folder
 mv spark-1.6.1-bin-hadoop2.6 spark
 
 cp /home/dataiku/spark/conf/spark-env.sh.template /home/dataiku/spark/conf/spark-env.sh
