@@ -259,6 +259,16 @@ nano /home/dataiku/spark/conf/spark-env.sh
 # Add the following lines
 export HADOOP_CONF_DIR=/home/dataiku/hadoop/etc/hadoop/
 
+# Edit 
+nano .bashrc
+
+# Add the foolwing line
+export SPARK_HOME=/home/dataiku/spark
+export PATH=$PATH:$SPARK_HOME/bin
+
+# Run
+source ~/.bashrc
+
 # Test Spark
 # Go to spark folder
 cd /home/dataiku/spark
@@ -285,20 +295,47 @@ tar zxvf apache-hive-1.2.1-bin.tar.gz
 # Rename hive folder
 mv apache-hive-1.2.1-bin hive
 
+# Edit 
+nano .bashrc
+
+# Add the foolwing line
+export HIVE_HOME=/home/dataiku/hive
+export PATH=$PATH:$HIVE_HOME/bin
+export CLASSPATH=$CLASSPATH:/home/dataiku/hadoop/lib/*:.
+export CLASSPATH=$CLASSPATH:home/dataiku/hadoop/lib/*:.
+
+# Run
+source ~/.bashrc
+
 # Copy hive-site.xml form master node to client
+scp /etc/hive/conf/hive-site.xml dataiku@edge:/home/dataiku/hive/conf
+scp /etc/hive/conf/hive-env.sh dataiku@edge:/home/dataiku/hive/conf
 
 # Edit hive-env.sh
-
+nano /home/dataiku/hive/conf/hive-env.sh
 
 # Add the following lines
-export HIVE_HOME=/usr/local/hive
-export PATH=$PATH:$HIVE_HOME/bin
-export CLASSPATH=$CLASSPATH:/usr/local/Hadoop/lib/*:.
-export CLASSPATH=$CLASSPATH:/usr/local/hive/lib/*:.
+hadoop fs -mkdir /tmp 
+hadoop fs -mkdir /user/hive/warehouse
+hadoop fs -chmod g+w /tmp 
+hadoop fs -chmod g+w /user/hive/warehouse
+
+
+dataiku@edge:~$ sed -i -e 's/system:java.io.tmpdir/tmp/g' /home/dataiku/hive/conf/hive-site.xml
+sed -i -e 's/system:user.name/user.name/g' /home/dataiku/hive/conf/hive-site.xml
+sed -i -e 's/${tmp}/tmp/g' /home/dataiku/hive/conf/hive-site.xml
+
+export HADOOP_USER_CLASSPATH_FIRST=true
+
+
+cat /home/dataiku/hive/conf/hive-site.xml | grep system:user.name
+
+
+# Test hive
+hive
+
+show database;
 
 ```
 
-> Step 12: Update Configuration files on Client Node
 
-```sh
-```
