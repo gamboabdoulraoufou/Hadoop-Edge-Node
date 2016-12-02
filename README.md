@@ -338,4 +338,9 @@ show database;
 
 ```
 
+> Step 16: Configure R
+
+```sh
+
+```
 
