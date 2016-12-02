@@ -209,6 +209,7 @@ hadoop hs -ls /user/
 ```
 
 > Step 13: Configure Mapreduce _Client node_
+
 ```sh
 # Copy marred-site.xml from master node to client node
 scp /etc/hadoop/2.4.2.0-258/0/mapred-site.xml dataiku@edge:/home/dataiku/hadoop/etc/hadoop/
@@ -225,12 +226,16 @@ nano /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
 <configuration>
 <property>
  <name>mapreduce.jobtracker.address</name>
- <value>hadoop-m:54311</value>
+ <value>hadoop-m</value>
  <description>The host and port that the MapReduce job tracker runs
   at. If “local”, then jobs are run in-process as a single map
   and reduce task.
 </description>
 </property>
+<property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+  </property>
 </configuration>
 
 # Run mapreduce
@@ -240,6 +245,7 @@ hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar pi 2 4
 ```
 
 > Step 14: Configure Spark _Client node_
+
 ```sh
 # Download spark (http://spark.apache.org/downloads.html)
 wget http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz
@@ -303,6 +309,7 @@ export HIVE_HOME=/home/dataiku/hive
 export PATH=$PATH:$HIVE_HOME/bin
 export CLASSPATH=$CLASSPATH:/home/dataiku/hadoop/lib/*:.
 export CLASSPATH=$CLASSPATH:home/dataiku/hadoop/lib/*:.
+export HADOOP_USER_CLASSPATH_FIRST=true
 
 # Run
 source ~/.bashrc
