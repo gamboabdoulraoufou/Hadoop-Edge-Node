@@ -106,7 +106,7 @@ sudo adduser dataiku
 sudo nano /etc/hosts
 
 # Add master host into client /etc/hosts file
-10.132.0.12 hadoop-m.c.equipe.internal hadoop-m
+hadoop-m.c.equipe.internal hadoop-m
 
 ``` 
 
@@ -193,20 +193,15 @@ source ~/.bashrc
 > Step 12: Configure HDFS _Client Node_
 
 ```sh
-# Edit /home/dataiku/hadoop/etc/hadoop/core-site.xml
-nano /home/dataiku/hadoop/etc/hadoop/core-site.xml
+# Copy core-site.xml and yarn-site.xml file from master node to client node (comment topology_script proprety in core-site.xml)
+scp /etc/hadoop/2.4.2.0-258/0/core-site.xml dataiku@edge:/home/dataiku/hadoop/etc/hadoop/
+scp /etc/hadoop/2.4.2.0-258/0/yarn-site.xml dataiku@edge:/home/dataiku/hadoop/etc/hadoop/
 
-# Chage the configuration to match to the following
-<configuration>
-<property>
-  <name>fs.defaultFS</name>
-  <value>hdfs://hadoop-m.c.equipe-1314.internal:8020</value>
-  <description>Use HDFS as file storage engine</description>
-</property>
-</configuration>
- 
-# Or copy core-site.xml from master node to client node
-scp /home/hduser/hadoop-2.6.0.tar.gz hdclient@ztg-client:/home/hdclient
+# Edit yarn-env.sh
+nano /home/dataiku/hadoop/etc/hadoop/yarn-env.sh
+
+# Add JAVA_HOME
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 
 # HDFS 
 hadoop hs -ls /user/
@@ -215,8 +210,15 @@ hadoop hs -ls /user/
 
 > Step 13: Configure Mapreduce _Client node_
 ```sh
-# Edit /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
+# Copy marred-site.xml from master node to client node
+scp /etc/hadoop/2.4.2.0-258/0/mapred-site.xml dataiku@edge:/home/dataiku/hadoop/etc/hadoop/
+
+OR
+
+# Create mapred-site.xml file
 cp /home/dataiku/hadoop/etc/hadoop/mapred-site.xml.template /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
+
+# Edit
 nano /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
 
 # Chage the configuration to match to the following
@@ -239,7 +241,7 @@ hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar pi 2 4
 
 > Step 14: Configure Spark _Client node_
 ```sh
-# Download spark
+# Download spark (http://spark.apache.org/downloads.html)
 wget http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz
 
 # Unpack spark
@@ -248,31 +250,52 @@ tar zxvf spark-1.6.1-bin-hadoop2.6.tgz
 # Remane Spark folder
 mv spark-1.6.1-bin-hadoop2.6 spark
 
+# Create spark configuration file
 cp /home/dataiku/spark/conf/spark-env.sh.template /home/dataiku/spark/conf/spark-env.sh
+
+# Edit Spark configuration file
 nano /home/dataiku/spark/conf/spark-env.sh
 
+# Add the following lines
 export HADOOP_CONF_DIR=/home/dataiku/hadoop/etc/hadoop/
-export HADOOP_CONF_DIR="${HADOOP_CONF_DIR:-/home/dataiku/hadoop/etc/hadoop}"
 
+# Test Spark
+# Go to spark folder
+cd /home/dataiku/spark
 
-# From master node copy core-site.xml and yarn-site.xml to client node
-chmod 644 *.xml
+# Run spark shell on yarn
+./bin/spark-shell --master yarn-client
 
-# change in hadoop in client node
-mv hadoop/etc/hadoop/core-site.xml hadoop/etc/hadoop/core-site.xml.bkp
-mv hadoop/etc/hadoop/yarn-site.xml hadoop/etc/hadoop/yarn-site.xml.bkp
+# Run scala command
+sc.parallelize(Seq(1, 2, 3)).sum()
 
-# copy yarn-site.xml and core-site.xml to hadoop home
-cp /home/dataiku/core-site.xml /home/dataiku/hadoop/etc/hadoop/
-cp /home/dataiku/yarn-site.xml /home/dataiku/hadoop/etc/hadoop/
-
-
-
+# Exit spark shell
+:quit
 ```
 
-> Step 12: Update Configuration files on Client Node
+> Step 15: Configure hive
 
 ```sh
+# Download hive
+wget http://mirrors.ukfast.co.uk/sites/ftp.apache.org/hive/hive-1.2.1/apache-hive-1.2.1-bin.tar.gz
+
+# Unpack Hive
+tar zxvf apache-hive-1.2.1-bin.tar.gz
+
+# Rename hive folder
+mv apache-hive-1.2.1-bin hive
+
+# Copy hive-site.xml form master node to client
+
+# Edit hive-env.sh
+
+
+# Add the following lines
+export HIVE_HOME=/usr/local/hive
+export PATH=$PATH:$HIVE_HOME/bin
+export CLASSPATH=$CLASSPATH:/usr/local/Hadoop/lib/*:.
+export CLASSPATH=$CLASSPATH:/usr/local/hive/lib/*:.
+
 ```
 
 > Step 12: Update Configuration files on Client Node
