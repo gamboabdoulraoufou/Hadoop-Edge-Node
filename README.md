@@ -211,7 +211,7 @@ hadoop hs -ls /user/
 > Step 13: Configure Mapreduce _Client node_
 
 ```sh
-# Copy marred-site.xml from master node to client node
+# Copy mapred-site.xml from master node to client node
 scp /etc/hadoop/2.4.2.0-258/0/mapred-site.xml dataiku@edge:/home/dataiku/hadoop/etc/hadoop/
 
 OR
@@ -221,6 +221,18 @@ cp /home/dataiku/hadoop/etc/hadoop/mapred-site.xml.template /home/dataiku/hadoop
 
 # Edit
 nano /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
+
+# Edit hadoop-env.sh
+nano /home/dataiku/hadoop/etc/hadoop/hadoop-env.sh
+
+# Add the following content
+The /etc/hadoop/hadoop-env.sh sets the maximum java heap memory for Hadoop, by Default it is:
+
+   export HADOOP_CLIENT_OPTS="-Xmx128m $HADOOP_CLIENT_OPTS"
+This Xmx setting is too low, simply change it to this and rerun
+
+   export HADOOP_CLIENT_OPTS="-Xmx2048m $HADOOP_CLIENT_OPTS"
+ 
 
 # Chage the configuration to match to the following
 <configuration>
