@@ -204,7 +204,7 @@ nano /home/dataiku/hadoop/etc/hadoop/yarn-env.sh
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 
 # HDFS 
-hadoop hs -ls /user/
+hadoop fs -ls /user/
 
 ```
 
