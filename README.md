@@ -320,7 +320,7 @@ nano .bashrc
 export HIVE_HOME=/home/dataiku/hive
 export PATH=$PATH:$HIVE_HOME/bin
 export CLASSPATH=$CLASSPATH:/home/dataiku/hadoop/lib/*:.
-export CLASSPATH=$CLASSPATH:home/dataiku/hadoop/lib/*:.
+export CLASSPATH=$CLASSPATH:/home/dataiku/hive/lib/*:.
 export HADOOP_USER_CLASSPATH_FIRST=true
 
 # Run
@@ -355,6 +355,8 @@ hive
 
 show database;
 
+
+hadoop fs -copyFromLocal /home/dataiku/hive/lib/* /home/dataiku/hive/lib/
 ```
 
 > Step 16: Configure R
