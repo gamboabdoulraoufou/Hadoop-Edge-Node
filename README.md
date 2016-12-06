@@ -1,5 +1,6 @@
 # Hadoop-Edge-Node
 The procedure below explains setting up an edge node for clients to access the Hadoop Cluster for submitting jobs.
+http://www.aerospike.com/docs/connectors/ashadoop/handson/edgeNodeSetup.html
 
 > Step 1: Install Java JDK
 
