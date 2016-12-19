@@ -364,6 +364,12 @@ hadoop fs -copyFromLocal /home/dataiku/hive/lib/* /home/dataiku/hive/lib/
 
 > Step 16: Configure R
 
+
+unset HADOOP_HDFS_HOME
+$HADOOP_HDFS_HOME
+hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar pi 2 4
+
+
 ```sh
 
 ```
