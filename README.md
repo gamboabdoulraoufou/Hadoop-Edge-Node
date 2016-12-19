@@ -345,8 +345,10 @@ dataiku@edge:~$ sed -i -e 's/system:java.io.tmpdir/tmp/g' /home/dataiku/hive/con
 sed -i -e 's/system:user.name/user.name/g' /home/dataiku/hive/conf/hive-site.xml
 sed -i -e 's/${tmp}/tmp/g' /home/dataiku/hive/conf/hive-site.xml
 
-export HADOOP_USER_CLASSPATH_FIRST=true
 
+nano .bashrc
+export HADOOP_USER_CLASSPATH_FIRST=true
+source ~/.bashrc
 
 cat /home/dataiku/hive/conf/hive-site.xml | grep system:user.name
 
