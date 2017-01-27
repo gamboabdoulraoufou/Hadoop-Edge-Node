@@ -223,6 +223,88 @@ cp /home/dataiku/hadoop/etc/hadoop/mapred-site.xml.template /home/dataiku/hadoop
 # Edit
 nano /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
 
+# Add the following content
+<property>
+    <name>mapreduce.application.framework.path</name>
+    <value>/hdp/apps/2.4.3.0-227/mapreduce/mapreduce.tar.gz#mr-framework</value>
+  </property>
+  <property>
+      <name>mapreduce.admin.user.env</name>
+      <value>LD_LIBRARY_PATH=/home/dataiku/hadoop/lib/native:/home/dataiku/hadoop/lib/native/$
+    </property>
+  <property>
+    <name>mapreduce.application.classpath</name>
+    <value></value>
+  </property>
+<property>
+ <name>mapreduce.admin.map.child.java.opts</name>
+ <value>-server -Djava.net.preferIPv4Stack=true
+   -Dhdp.version=2.4.3.0-227
+   </value>
+ <final>true</final>
+</property>
+ <property>
+  <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+ </property>
+<property>
+ <name>mapreduce.admin.reduce.child.java.opts</name>
+ <value>-server -Djava.net.preferIPv4Stack=true -Dhdp.version=2.4.3.0-227</value>
+ <final>true</final>
+</property>
+  <property>
+    <name>mapreduce.framwork.name</name>
+    <value>yarn</value>
+  </property>
+  <property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>1536</value>
+  </property>
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>-Xmx1228m</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>2048</value>
+    </property>
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>2048</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.java.opts</name>
+    <value>-Xmx1638m</value>
+  </property>
+  <property>
+    <name>mapreduce.task.io.sort.mb</name>
+    <value>859</value>
+  </property>
+  <property>
+    <name>mapreduce.task.io.sort.factor</name>
+    <value>100</value>
+  </property>
+<property>
+    <name>mapreduce.reduce.shuffle.parallelcopies</name>
+    <value>30</value>
+  </property>
+  <property>
+    <name>mapreduce.jobhistory.address</name>
+      <value>hadoop-w-0.c.equipe-1314.internal:10020</value>
+  </property>
+  <property>
+    <name>mapreduce.jobhistory.webapp.address</name>
+    <value>hadoop-w-0.c.equipe-1314.internal:19888</value>
+  </property>
+  <property>
+    <name>mapreduce.jobhistory.intermediate-done-dir</name>
+    <value>/mr-history/tmp</value>
+  </property>
+  <property>
+    <name>mapreduce.jobhistory.done-dir</name>
+    <value>/mr-history/done</value>
+  </property>
+  
 # Edit hadoop-env.sh
 nano /home/dataiku/hadoop/etc/hadoop/hadoop-env.sh
 
