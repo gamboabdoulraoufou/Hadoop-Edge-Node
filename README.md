@@ -205,7 +205,10 @@ sudo su hdfs
 hadoop fs -mkdir /user/dataiku/
 hadoop fs -chown -R dataiku:dataiku /user/dataiku
 
-# On master node 
+# Log out hdfs user
+exit
+
+# Create temp dir for dataiku 
 sudo su dataiku
 mkdir /home/dataiku/tmp
 chmod 777 /home/dataiku/tmp
@@ -219,13 +222,13 @@ chmod 777 /home/dataiku/tmp
 sudo su dataiku
 
 # download hadoop distribution
-wget http://apache.trisect.eu/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz
+wget http://apache.trisect.eu/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz
 
 # Unpack
-tar zxvf hadoop-2.6.0.tar.gz
+tar zxvf hadoop-2.7.1.tar.gz
 
 # Rename Hadoop folder
-mv hadoop-2.6.0 hadoop
+mv hadoop-2.7.1 hadoop
 
 ```
 
@@ -236,7 +239,7 @@ mv hadoop-2.6.0 hadoop
 nano .bashrc
 
 # Add the following code
-#HADOOP VARIABLES START
+# HADOOP VARIABLES START
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 export HADOOP_INSTALL=/home/dataiku/hadoop
 export PATH=$PATH:$HADOOP_INSTALL/bin
@@ -248,7 +251,7 @@ export PATH=$PATH:$HADOOP_INSTALL/sbin
 export YARN_HOME=$HADOOP_INSTALL
 export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_INSTALL/lib/native
 export HADOOP_OPTS="-Djava.library.path=$HADOOP_INSTALL/lib/native"
-#HADOOP VARIABLES END
+# HADOOP VARIABLES END
 
 # Run 
 source ~/.bashrc
@@ -259,8 +262,8 @@ source ~/.bashrc
 
 ```sh
 # Copy core-site.xml and yarn-site.xml file from master node to client node (comment topology_script proprety in core-site.xml)
-scp /etc/hadoop/2.4.2.0-258/0/core-site.xml dataiku@edge:/home/dataiku/hadoop/etc/hadoop/
-scp /etc/hadoop/2.4.2.0-258/0/yarn-site.xml dataiku@edge:/home/dataiku/hadoop/etc/hadoop/
+scp /etc/hadoop/2.4.3.0-227/0/core-site.xml dataiku@edge-server:/home/dataiku/hadoop/etc/hadoop/
+scp /etc/hadoop/2.4.3.0-227/0/yarn-site.xml dataiku@edge-server:/home/dataiku/hadoop/etc/hadoop/
 
 # Edit yarn-env.sh
 nano /home/dataiku/hadoop/etc/hadoop/yarn-env.sh
@@ -277,7 +280,21 @@ hadoop fs -ls /user/
 
 ```sh
 # Copy mapred-site.xml from master node to client node
-scp /etc/hadoop/2.4.2.0-258/0/mapred-site.xml dataiku@edge:/home/dataiku/hadoop/etc/hadoop/
+scp /etc/hadoop/2.4.3.0-227/0/mapred-site.xml dataiku@edge-server:/home/dataiku/hadoop/etc/hadoop/
+
+sudo mkdir -p -m 751 /usr/hdp/2.4.3.0-227/hadoop/lib/native 
+sudo mkdir -p -m 751 /usr/local/lib/hadoop/lib/
+sudo mkdir -p -m 751 /etc/hadoop/conf/secure
+sudo mkdir -p -m 751 /hdp/apps/2.4.3.0-227/
+
+scp /usr/hdp/2.4.3.0-227/hadoop/lib/native/Linux-amd64-64 dataiku@edge-server:/usr/hdp/2.4.3.0-227/hadoop/lib/native/
+scp /usr/local/lib/hadoop/lib/* dataiku@edge-server:/usr/local/lib/hadoop/lib/
+scp /usr/hdp/2.4.3.0-227/hadoop/lib/hadoop-lzo-0.6.0.2.4.3.0-227.jar dataiku@edge-server:/usr/hdp/2.4.3.0-227/hadoop/lib/
+scp /etc/hadoop/conf/secure/* dataiku@edge-server:/etc/hadoop/conf/secure/
+scp /hdp/apps/2.4.3.0-227/* dataiku@edge-server:/hdp/apps/2.4.3.0-227/
+
+replace ${hdp.version} by 2.4.3.0-227
+
 
 OR
 
@@ -399,7 +416,7 @@ This Xmx setting is too low, simply change it to this and rerun
 
 # Run mapreduce
 cd hadoop
-hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0.jar pi 2 4
+hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar pi 2 4
 
 ```
 
