@@ -9,7 +9,10 @@ http://www.aerospike.com/docs/connectors/ashadoop/handson/edgeNodeSetup.html
 sudo apt-get update
 
 # Install some prerequisite packages
-sudo apt-get -y install openssh scp curl wget python tar unzip telnet telnet-server
+sudo apt-get -y install scp curl wget tar unzip
+sudo apt-get -y install xinetd telnetd
+sudo apt-get install openssh-server
+sudo apt-get install openssh-client
 
 # Install Java SDK
 sudo apt-get install default-jdk
@@ -35,7 +38,7 @@ sudo nano /etc/sysctl.conf
 
 ```
 > Add the following lines at the end
-#disable ipv6
+# Disable ipv6  
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
@@ -67,12 +70,14 @@ cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 # log to localhost
 ssh dataiku@localhost
 
-# logout
+# logout localhost
 exit
 
 # Change right on authorized_keys
 chmod 600 $HOME/.ssh/authorized_keys
 
+# logout dataiku
+exit
 ```
 
 > Step 5: Modify sshd_config file _master node_
@@ -81,6 +86,7 @@ Uncomment PasswordAuthentication yes
 Comment PasswordAuthentication no
 
 ```sh
+
 # create a copy of sshd_config file
 sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
@@ -99,6 +105,9 @@ sudo service sshd restart
 # Add user dataiku on master node
 sudo adduser dataiku
 
+# Change password
+sudo su passwd dataiku
+
 ```
 > Step 7: Add master host into client /etc/hosts file
 
@@ -114,29 +123,84 @@ hadoop-m.c.equipe.internal hadoop-m
 > Step 8: Add ssh key from client node to master node
 
 ``` sh
+# log as dataiku user
+sudo su dataiku
+
 # Copy key
 ssh-copy-id -i ~/.ssh/id_rsa.pub hadoop-m
 
 # Test connection. You should access without password.
 ssh hadoop-m
 
+# Log out master node
+exit
+
 ```
 
-> Step 9: Modify sshd_config file _master node_ to set initial configuration
+> Step 9: Modify sshd_config file _client node_
 Set PermitRootLogin to yes
-Uncomment PasswordAuthentication yes
-Comment PasswordAuthentication no
+set PasswordAuthentication yes
 
 ```sh
+
 # create a copy of sshd_config file
-sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak2
-sudo cp /etc/ssh/sshd_config.bak /etc/ssh/sshd_config
+sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+
+# Edit sshd_config file and change current configuration
+sudo nano /etc/ssh/sshd_config
+
+# Initialise configuration                            
+sudo service ssh restart
 
 ```
 
-> Step 10: Create Hadoop user _Master node_
+> Step 10: Add client host into master /etc/hosts file
 
 ```sh
+# Edit file 
+sudo nano /etc/hosts
+
+# Add master host into client /etc/hosts file
+edge-server.c.equipe.internal edge-server
+``` 
+
+> Step 11: Add ssh key from master node to client node
+
+``` sh
+# log as dataiku user
+sudo su dataiku
+cd
+
+# Generate ssh key
+ssh-keygen -t rsa -P ""
+
+# Add ssh key to authorized host
+cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+
+# log to localhost
+ssh dataiku@localhost
+
+# logout localhost
+exit
+
+# Copy key
+ssh-copy-id -i ~/.ssh/id_rsa.pub edge-server
+
+# Test connection. You should access without password.
+ssh edge-server
+
+# Log out client node
+exit
+
+```
+
+
+> Step 12: Create Hadoop user _Master node_
+
+```sh
+# Log as hdfs superuser
+sudo su hdfs
+
 # Create a directory structure in HDFS for the new use
 hadoop fs -mkdir /user/dataiku/
 hadoop fs -chown -R dataiku:dataiku /user/dataiku
@@ -148,7 +212,7 @@ chmod 777 /home/dataiku/tmp
 
 ```
 
-> Step 10: Download Hadoop ditribution _Client node_
+> Step 11: Download Hadoop ditribution _Client node_
 
 ```sh
 # Log to dataiku
