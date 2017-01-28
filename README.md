@@ -282,19 +282,16 @@ hadoop fs -ls /user/
 # Copy mapred-site.xml from master node to client node
 scp /etc/hadoop/2.4.3.0-227/0/mapred-site.xml dataiku@edge-server:/home/dataiku/hadoop/etc/hadoop/
 
-sudo mkdir -p -m 751 /usr/hdp/2.4.3.0-227/hadoop/lib/native 
-sudo mkdir -p -m 751 /usr/local/lib/hadoop/lib/
+sudo mkdir -p -m 751 /usr/hdp/2.4.3.0-227 
+sudo mkdir -p -m 751 /usr/local/lib/hadoop/lib
 sudo mkdir -p -m 751 /etc/hadoop/conf/secure
-sudo mkdir -p -m 751 /hdp/apps/2.4.3.0-227/
 
-scp /usr/hdp/2.4.3.0-227/hadoop/lib/native/Linux-amd64-64 dataiku@edge-server:/usr/hdp/2.4.3.0-227/hadoop/lib/native/
 scp /usr/local/lib/hadoop/lib/* dataiku@edge-server:/usr/local/lib/hadoop/lib/
-scp /usr/hdp/2.4.3.0-227/hadoop/lib/hadoop-lzo-0.6.0.2.4.3.0-227.jar dataiku@edge-server:/usr/hdp/2.4.3.0-227/hadoop/lib/
 scp /etc/hadoop/conf/secure/* dataiku@edge-server:/etc/hadoop/conf/secure/
-scp /hdp/apps/2.4.3.0-227/* dataiku@edge-server:/hdp/apps/2.4.3.0-227/
+nohup scp /usr/hdp/apps/2.4.3.0-227/* dataiku@edge-server:/usr/hdp/apps/2.4.3.0-227/ &
 
-replace ${hdp.version} by 2.4.3.0-227
-
+# Replace ${hdp.version} by 2.4.3.0-227
+sed -i -e 's/${hdp.version}/2.4.3.0-227/g' /home/dataiku/hadoop/etc/hadoop/mapred-site.xml
 
 OR
 
