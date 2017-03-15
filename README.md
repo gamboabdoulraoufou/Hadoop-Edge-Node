@@ -478,6 +478,9 @@ nano .bashrc
 # Spark variables start
 export SPARK_HOME=/home/dataiku/spark
 export PATH=$PATH:$SPARK_HOME/bin
+
+export PYSPARK_PYTHON=python2.7
+
 # Spark variables end
 
 # Run
