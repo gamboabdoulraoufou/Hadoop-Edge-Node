@@ -5,6 +5,8 @@ http://www.aerospike.com/docs/connectors/ashadoop/handson/edgeNodeSetup.html
 > Step 1: Install Java JDK
 
 ```sh
+#install anaconda /usr/local/anaconda2
+
 # Update package source
 sudo apt-get update
 
